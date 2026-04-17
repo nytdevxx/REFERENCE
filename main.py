@@ -451,7 +451,6 @@ def menu_profile(msg: types.Message):
         f"👤 <b>Name:</b>          {user['first_name']}\n"
         f"💵 <b>Balance:</b>       {user['balance']} TK\n"
         f"👥 <b>Referrals:</b>     {user['referrals']}\n"
-        f"🔐 <b>Account:</b>       {status}\n"
         f"📅 <b>Joined:</b>        {joined}\n"
     )
     bot.send_message(msg.chat.id, text, reply_markup=kb_back())
