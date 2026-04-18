@@ -21,7 +21,7 @@ from telebot import types
 
 BOT_TOKEN   = os.getenv("BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
 OWNER_ID    = int(os.getenv("OWNER_ID", "8499435987"))
-ADMIN_USERNAME = "@sefuax"
+ADMIN_USERNAME = "@@SoulFoex"
 BOT_USERNAME   = os.getenv("BOT_USERNAME", "YourBotUsername")  # without @
 
 REFERRAL_REWARD   = 20    # TK per referral
@@ -500,7 +500,7 @@ def menu_admin(msg: types.Message):
         "━━━━━━━━━━━━━━━━━━\n\n"
         f"For support or any issues, reach out to our admin:\n\n"
         f"💬 <b>Admin:</b> {ADMIN_USERNAME}\n\n"
-        "⏱ Response time: usually within 24 hours."
+        "⏱ 𝙍𝙚𝙨𝙥𝙤𝙣𝙨𝙚 𝙏𝙞𝙢𝙚 : 24/7 𝙎𝙐𝙋𝙋𝙊𝙍𝙏 𝙤𝙧 𝘼𝙇𝙇 𝙏𝙞𝙈𝙀 𝙃𝙀𝙍𝙀"
     )
     bot.send_message(msg.chat.id, text, reply_markup=kb_back())
 
