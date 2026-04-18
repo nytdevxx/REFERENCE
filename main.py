@@ -21,7 +21,7 @@ from telebot import types
 
 BOT_TOKEN   = os.getenv("BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
 OWNER_ID    = int(os.getenv("OWNER_ID", "8499435987"))
-ADMIN_USERNAME = "@@SoulFoex"
+ADMIN_USERNAME = "@SoulFoex"
 BOT_USERNAME   = os.getenv("BOT_USERNAME", "YourBotUsername")  # without @
 
 REFERRAL_REWARD   = 20    # TK per referral
