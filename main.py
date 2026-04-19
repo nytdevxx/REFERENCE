@@ -1171,19 +1171,24 @@ def cmd_broadcast(msg: types.Message):
     if msg.from_user.id != OWNER_ID:
         return
 
-    # Message extract করা
-    parts = msg.text.split(maxsplit=1)
-    if len(parts) < 2:
+    # সঠিকভাবে message extract করা (পুরো text নেওয়া)
+    if len(msg.text.split()) < 2:
         bot.send_message(
             msg.chat.id,
             "❌ Usage: <code>/broadcast তোমার মেসেজ এখানে লিখো</code>\n\n"
             "উদাহরণ:\n"
-            "<code>/broadcast Hello everyone! New update is live 🔥</code>",
+            "<code>/broadcast Hello everyone! New update is live 🔥\n"
+            "এখন থেকে withdraw minimum 100 TK করা যাবে।</code>",
             parse_mode="HTML"
         )
         return
 
-    broadcast_text = parts[1].strip()
+    # এখানে সঠিক লাইন
+    broadcast_text = msg.text.split(maxsplit=1)[1].strip()
+
+    if not broadcast_text:
+        bot.send_message(msg.chat.id, "❌ Message খালি দিতে পারবে না।")
+        return
 
     # সব user এর ID নিয়ে আসা
     with _db_lock, get_conn() as conn:
@@ -1195,28 +1200,31 @@ def cmd_broadcast(msg: types.Message):
 
     total = len(users)
     sent = 0
+    failed = 0
 
     for row in users:
         user_id = row["user_id"]
         try:
-            bot.send_message(user_id, broadcast_text, parse_mode="HTML")  # bot এর default HTML parse_mode চলবে
+            bot.send_message(user_id, broadcast_text, parse_mode="HTML")
             sent += 1
         except Exception as e:
+            failed += 1
             logger.warning(f"Broadcast failed for user {user_id}: {e}")
-            # continue (failed user কে ignore করবো)
+            continue
 
     # Admin কে report
     bot.send_message(
         msg.chat.id,
         f"✅ <b>Broadcast Successful!</b>\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"📨 <b>Sent to:</b> {sent}/{total} users\n\n"
+        f"📨 <b>Sent to:</b> {sent}/{total} users\n"
+        f"❌ <b>Failed:</b> {failed} users\n\n"
         f"📝 <b>Message:</b>\n"
-        f"{broadcast_text[:300]}{'...' if len(broadcast_text) > 300 else ''}",
+        f"{broadcast_text[:400]}{'...' if len(broadcast_text) > 400 else ''}",
         parse_mode="HTML"
     )
 
-    logger.info(f"🔊 Broadcast sent to {sent}/{total} users by admin")
+    logger.info(f"🔊 Broadcast sent to {sent}/{total} users (failed: {failed})")
 
 
 # ─────────────────────────────────────────────
