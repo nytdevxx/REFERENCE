@@ -1158,6 +1158,63 @@ def cmd_check(msg: types.Message):
     bot.send_message(msg.chat.id, text)
     logger.info("Admin checked info for user %s", user["user_id"])
 
+  # ─────────────────────────────────────────────
+#  NEW ADMIN COMMANDS (এখানে নতুন command যোগ করা হয়েছে)
+# ─────────────────────────────────────────────
+
+@bot.message_handler(commands=["broadcast"])
+def cmd_broadcast(msg: types.Message):
+    """Admin: /broadcast <message> — Send message to ALL users"""
+    if msg.from_user.id != OWNER_ID:
+        return
+
+    # Message extract করা
+    parts = msg.text.split(maxsplit=1)
+    if len(parts) < 2:
+        bot.send_message(
+            msg.chat.id,
+            "❌ Usage: <code>/broadcast তোমার মেসেজ এখানে লিখো</code>\n\n"
+            "উদাহরণ:\n"
+            "<code>/broadcast Hello everyone! New update is live 🔥</code>",
+            parse_mode="HTML"
+        )
+        return
+
+    broadcast_text = parts[1].strip()
+
+    # সব user এর ID নিয়ে আসা
+    with _db_lock, get_conn() as conn:
+        users = conn.execute("SELECT user_id FROM users").fetchall()
+
+    if not users:
+        bot.send_message(msg.chat.id, "❌ No users found in database.")
+        return
+
+    total = len(users)
+    sent = 0
+
+    for row in users:
+        user_id = row["user_id"]
+        try:
+            bot.send_message(user_id, broadcast_text, parse_mode="HTML")  # bot এর default HTML parse_mode চলবে
+            sent += 1
+        except Exception as e:
+            logger.warning(f"Broadcast failed for user {user_id}: {e}")
+            # continue (failed user কে ignore করবো)
+
+    # Admin কে report
+    bot.send_message(
+        msg.chat.id,
+        f"✅ <b>Broadcast Successful!</b>\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"📨 <b>Sent to:</b> {sent}/{total} users\n\n"
+        f"📝 <b>Message:</b>\n"
+        f"{broadcast_text[:300]}{'...' if len(broadcast_text) > 300 else ''}",
+        parse_mode="HTML"
+    )
+
+    logger.info(f"🔊 Broadcast sent to {sent}/{total} users by admin")
+
 
 # ─────────────────────────────────────────────
 #  ENTRY POINT
